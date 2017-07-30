@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
                 NfcIntent = PendingIntent.getActivity(MainActivity.this,
                         0, new Intent(MainActivity.this, MainActivity.class)
                                 .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+                Toast.makeText(this, "NFC ready!",
+                        Toast.LENGTH_LONG).show();
             }
         }
 
@@ -73,8 +75,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        NfcAndroidAdapter.enableForegroundDispatch(this, NfcIntent, null,
-                null);
+        if(NfcAndroidAdapter != null && NfcIntent != null) {
+            NfcAndroidAdapter.enableForegroundDispatch(this, NfcIntent, null,
+                    null);
+        }
     }
 
     @Override
@@ -84,14 +88,26 @@ public class MainActivity extends AppCompatActivity {
         String action = intent.getAction();
         if(action.equals(NfcAdapter.ACTION_NDEF_DISCOVERED) || action.equals(NfcAdapter.ACTION_TECH_DISCOVERED)){
             String tagContent = "";
+            Toast.makeText(this, "Found a tag",
+                    Toast.LENGTH_LONG).show();
             Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
             String[] techList = tag.getTechList();
             if(action.equals(NfcAdapter.ACTION_NDEF_DISCOVERED))
             {
                 tagContent = ndefReadTag(tag);
-                currentDetectedTag = tag;
+                Toast.makeText(this, tagContent,
+                        Toast.LENGTH_LONG).show();
+
             }
 
+        }
+
+        if(action.equals(NfcAdapter.ACTION_TAG_DISCOVERED)){
+            Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+            currentDetectedTag = tag;
+            String tagDesc = tag.toString();
+            Toast.makeText(this, tagDesc,
+                    Toast.LENGTH_LONG).show();
         }
 
     }
