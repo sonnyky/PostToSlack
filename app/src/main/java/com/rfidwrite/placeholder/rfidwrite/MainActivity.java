@@ -21,6 +21,11 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class MainActivity extends Activity {
 
@@ -38,7 +43,8 @@ public class MainActivity extends Activity {
     TextView message;
     Button btnWrite;
 
-    public static String Id_Value;
+    private TagDatabase tagDatabase;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +55,7 @@ public class MainActivity extends Activity {
         message = (TextView) findViewById(R.id.dataInput);
         btnWrite = (Button) findViewById(R.id.writeDataBtn);
 
-
+        tagDatabase = new TagDatabase(this.context);
 
         btnWrite.setOnClickListener(new View.OnClickListener()
         {
@@ -106,15 +112,39 @@ public class MainActivity extends Activity {
         if (msgs == null || msgs.length == 0) return;
 
         String text = "";
-//        String tagId = new String(msgs[0].getRecords()[0].getType());
         byte[] payload = msgs[0].getRecords()[0].getPayload();
         String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16"; // Get the Text Encoding
         int languageCodeLength = payload[0] & 0063; // Get the Language Code, e.g. "en"
-        // String languageCode = new String(payload, 1, languageCodeLength, "US-ASCII");
 
         try {
             // Get the Text
             text = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1, textEncoding);
+
+            // Check if the tag name is already in the database.
+            EntranceTag detectedTag = tagDatabase.findTag(text);
+            if(detectedTag != null){
+                Toast.makeText(this, "This tag is already registered with id : " + detectedTag.GetTagIdFromDb() + " on " + detectedTag.GetTagDate() + " at " + detectedTag.GetTagTime(), Toast.LENGTH_LONG).show();
+            }else{
+                // If tag is not in the database, add it
+                Toast.makeText(this, "Registering tag... " , Toast.LENGTH_LONG).show();
+
+                // Get current date
+                Date todayDate = Calendar.getInstance().getTime();
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                String todayString = formatter.format(todayDate);
+
+                // Get current time
+                Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+9:00"));
+                Date currentLocalTime = cal.getTime();
+                DateFormat date = new SimpleDateFormat("HH:mm:ss a");
+                date.setTimeZone(TimeZone.getTimeZone("GMT+9:00"));
+                String localTime = date.format(currentLocalTime);
+
+                // Finally add the new tag to database
+                EntranceTag newDetectedTag = new EntranceTag(text, todayString, localTime, 1);
+                tagDatabase.addTag(newDetectedTag);
+            }
+
         } catch (UnsupportedEncodingException e) {
             Log.e("UnsupportedEncoding", e.toString());
         }
