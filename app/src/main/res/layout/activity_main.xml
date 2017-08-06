@@ -26,9 +26,7 @@
         android:inputType="textPersonName"
         android:text="Input Data"
         app:layout_constraintTop_toBottomOf="@+id/title"
-        app:layout_constraintLeft_toLeftOf="@+id/title"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="55dp" />
+        app:layout_constraintLeft_toLeftOf="@+id/title" />
 
     <Button
         android:id="@+id/writeDataBtn"
@@ -36,8 +34,40 @@
         android:layout_height="wrap_content"
         android:text="Write Data"
         app:layout_constraintTop_toBottomOf="@+id/dataInput"
-        app:layout_constraintLeft_toLeftOf="@+id/dataInput"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="150dp" />
+        app:layout_constraintLeft_toLeftOf="@+id/dataInput" />
+
+    <TextView
+        android:id="@+id/processStatus"
+        android:layout_width="300dp"
+        android:layout_height="40dp"
+        android:fontFamily="sans-serif"
+        android:text="TextView"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:text="リストバンドを近づけてください" />
+
+    <ImageView
+        android:id="@+id/tagReadCompleteMark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/checkmark"
+        app:layout_constraintTop_toBottomOf="@+id/processStatus"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <TextView
+        android:id="@+id/tagDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:textSize="14sp"
+        android:layout_marginTop="17dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tagReadCompleteMark" />
 
 </android.support.constraint.ConstraintLayout>
