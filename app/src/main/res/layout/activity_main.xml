@@ -41,19 +41,20 @@
         android:layout_width="300dp"
         android:layout_height="40dp"
         android:fontFamily="sans-serif"
-        android:text="TextView"
+        android:text="リストバンドを近づけてください"
         android:textAlignment="center"
         android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:text="リストバンドを近づけてください" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/tagReadCompleteMark"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:src="@drawable/checkmark"
         app:srcCompat="@drawable/checkmark"
         app:layout_constraintTop_toBottomOf="@+id/processStatus"
         app:layout_constraintRight_toRightOf="parent"
@@ -63,9 +64,9 @@
         android:id="@+id/tagDetails"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
-        android:textSize="14sp"
         android:layout_marginTop="17dp"
+        android:textSize="14sp"
+        android:visibility="invisible"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tagReadCompleteMark" />

@@ -12,10 +12,12 @@ import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.os.Parcelable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +45,10 @@ public class MainActivity extends Activity {
     TextView message;
     Button btnWrite;
 
+    ImageView tagDetectionCheckMark;
+    TextView detectionStatus;
+    TextView detectedTagDetails;
+
     private TagDatabase tagDatabase;
 
     @Override
@@ -54,6 +60,10 @@ public class MainActivity extends Activity {
         tvNFCContent = (TextView) findViewById(R.id.title);
         message = (TextView) findViewById(R.id.dataInput);
         btnWrite = (Button) findViewById(R.id.writeDataBtn);
+
+        detectionStatus = (TextView) findViewById(R.id.processStatus);
+        tagDetectionCheckMark = (ImageView) findViewById(R.id.tagReadCompleteMark);
+        detectedTagDetails = (TextView) findViewById(R.id.tagDetails);
 
         tagDatabase = new TagDatabase(this.context);
 
@@ -123,7 +133,19 @@ public class MainActivity extends Activity {
             // Check if the tag name is already in the database.
             EntranceTag detectedTag = tagDatabase.findTag(text);
             if(detectedTag != null){
-                Toast.makeText(this, "This tag is already registered with id : " + detectedTag.GetTagIdFromDb() + " on " + detectedTag.GetTagDate() + " at " + detectedTag.GetTagTime(), Toast.LENGTH_LONG).show();
+                String detectionResult = "This tag is already registered with id : " + detectedTag.GetTagIdFromDb() + " on " + detectedTag.GetTagDate() + " at " + detectedTag.GetTagTime();
+                String tagDetectionStatus = "認識しました";
+                detectionStatus.setText(tagDetectionStatus);
+                detectedTagDetails.setText(detectionResult);
+                tagDetectionCheckMark.setVisibility(View.VISIBLE);
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        ResetViews();
+                    }
+                }, 2000);
+
             }else{
                 // If tag is not in the database, add it
                 Toast.makeText(this, "Registering tag... " , Toast.LENGTH_LONG).show();
@@ -151,6 +173,12 @@ public class MainActivity extends Activity {
 
         tvNFCContent.setText("NFC Content: " + text);
 
+    }
+
+    private void ResetViews(){
+        detectedTagDetails.setText("");
+        detectionStatus.setText("");
+        tagDetectionCheckMark.setVisibility(View.INVISIBLE);
     }
 
 
