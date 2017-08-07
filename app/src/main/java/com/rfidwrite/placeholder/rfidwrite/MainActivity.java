@@ -138,7 +138,7 @@ public class MainActivity extends Activity {
                 detectionStatus.setText(tagDetectionStatus);
                 detectedTagDetails.setText(detectionResult);
                 tagDetectionCheckMark.setVisibility(View.VISIBLE);
-
+                detectedTagDetails.setVisibility(View.VISIBLE);
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
