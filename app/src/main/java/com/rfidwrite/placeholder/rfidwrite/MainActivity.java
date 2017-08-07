@@ -133,22 +133,24 @@ public class MainActivity extends Activity {
             // Check if the tag name is already in the database.
             EntranceTag detectedTag = tagDatabase.findTag(text);
             if(detectedTag != null){
-                String detectionResult = "This tag is already registered with id : " + detectedTag.GetTagIdFromDb() + " on " + detectedTag.GetTagDate() + " at " + detectedTag.GetTagTime();
-                String tagDetectionStatus = "認識しました";
+                String detectionResult = "タグ id : " + detectedTag.GetTagIdFromDb() + "、" + detectedTag.GetTagDate() + "、 " + detectedTag.GetTagTime() + " に入場しました";
+                String tagDetectionStatus = "タグ認識しました";
                 detectionStatus.setText(tagDetectionStatus);
                 detectedTagDetails.setText(detectionResult);
                 tagDetectionCheckMark.setVisibility(View.VISIBLE);
                 detectedTagDetails.setVisibility(View.VISIBLE);
+
+
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         ResetViews();
                     }
-                }, 2000);
+                }, 10000);
 
             }else{
                 // If tag is not in the database, add it
-                Toast.makeText(this, "Registering tag... " , Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "タグを記憶します... " , Toast.LENGTH_LONG).show();
 
                 // Get current date
                 Date todayDate = Calendar.getInstance().getTime();
@@ -177,7 +179,7 @@ public class MainActivity extends Activity {
 
     private void ResetViews(){
         detectedTagDetails.setText("");
-        detectionStatus.setText("");
+        detectionStatus.setText(R.string.waiting_for_tag);
         tagDetectionCheckMark.setVisibility(View.INVISIBLE);
     }
 
@@ -215,8 +217,6 @@ public class MainActivity extends Activity {
         return recordNFC;
     }
 
-
-
     @Override
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
@@ -238,8 +238,6 @@ public class MainActivity extends Activity {
         WriteModeOn();
     }
 
-
-
     /********Enable Write**********************/
     private void WriteModeOn(){
         writeMode = true;
@@ -250,4 +248,26 @@ public class MainActivity extends Activity {
         writeMode = false;
         nfcAdapter.disableForegroundDispatch(this);
     }
+
+    private long GetElapsedTime(Date start, Date end){
+
+        long elapsedTimeInMilliSec = end.getTime() - start.getTime();
+        return elapsedTimeInMilliSec;
+    }
+
+    private int CalculateAdditionalCharge(Date entry, Date exit){
+        int multiplier = 0;
+        long elapsedTime = GetElapsedTime(entry, exit) - 1800000; // Substract 30 mins from elapsed time.
+
+        if(elapsedTime <= 0){
+            return 0;
+        }
+
+        multiplier = (int) elapsedTime / 1800000;
+        if(elapsedTime % 1800000 > 600000){
+            multiplier++;
+        }
+        return multiplier * 500; // 500 is the additional charge per 30 mins
+    }
+
 }

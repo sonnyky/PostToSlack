@@ -41,7 +41,7 @@
         android:layout_width="300dp"
         android:layout_height="40dp"
         android:fontFamily="sans-serif"
-        android:text="リストバンドを近づけてください"
+        android:text="@string/waiting_for_tag"
         android:textAlignment="center"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"

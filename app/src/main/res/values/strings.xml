@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">RfidWrite</string>
+    <string name="waiting_for_tag">リストバンドを近づけてください</string>
 </resources>
