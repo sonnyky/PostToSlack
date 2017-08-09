@@ -7,15 +7,12 @@ package com.rfidwrite.placeholder.rfidwrite;
 public class EntranceTag {
     private int dbId;
     private String tagId;
-    private String dateDetected;
-    private String timeDetected;
+    private String dateTimeDetected;
     private int inUse;
 
-    public EntranceTag( String tagId, String date, String time, int inUseFlag){
-        this.dbId = dbId;
+    public EntranceTag( String tagId, String dateTime, int inUseFlag){
         this.tagId = tagId;
-        this.dateDetected = date;
-        this.timeDetected = time;
+        this.dateTimeDetected = dateTime;
         this.inUse = inUseFlag;
     }
 
@@ -27,13 +24,8 @@ public class EntranceTag {
         return tagId;
     }
 
-    public String GetTagDate(){
-        return dateDetected;
-    }
-
-
-    public String GetTagTime(){
-        return timeDetected;
+    public String GetTagDateTime(){
+        return dateTimeDetected;
     }
 
     public int GetTagUsedFlag(){
@@ -44,12 +36,8 @@ public class EntranceTag {
         dbId = idToSet;
     }
 
-    public void SetDateDetected(String dateInput){
-        this.dateDetected = dateInput;
-    }
-
-    public void SetTimeDetected(String timeInput){
-        this.timeDetected = timeInput;
+    public void SetDateTimeDetected(String dateTimeInput){
+        this.dateTimeDetected = dateTimeInput;
     }
 
     public void SetUsedFlag(int flag){

@@ -14,14 +14,13 @@ import java.util.List;
 
 public class TagDatabase extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION =    1;
-    private static final String    DATABASE_NAME = "timeTracker";
+    private static final int DATABASE_VERSION = 3;
+    private static final String DATABASE_NAME = "timeTracker";
     private static final String TABLE_TAGS = "tags";
 
     private static final String COLUMN_ID = "_id";
     private  static final String COLUMN_TAGID = "tagId";
-    private static final String COLUMN_DATE = "date";
-    private static final String COLUMN_TIME = "time";
+    private static final String COLUMN_DATE_TIME= "date_time";
     private static final String COLUMN_USED = "inUse";
 
     public TagDatabase(Context context) {
@@ -29,12 +28,14 @@ public class TagDatabase extends SQLiteOpenHelper {
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_TAGS_TABLE = "CREATE    TABLE " + TABLE_TAGS + "(" + COLUMN_ID + " INTEGER PRIMARY KEY," + COLUMN_TAGID + " TEXT," + COLUMN_DATE + " TEXT," + COLUMN_TIME + " TEXT," + COLUMN_USED + " INTEGER" + ")";
+        String CREATE_TAGS_TABLE = "CREATE TABLE " + TABLE_TAGS + "(" + COLUMN_ID + " INTEGER PRIMARY KEY," + COLUMN_TAGID + " TEXT," + COLUMN_DATE_TIME + " TEXT," + COLUMN_USED + " INTEGER" + ")";
         db.execSQL(CREATE_TAGS_TABLE);
+        System.out.print("Creating new database");
     }
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TAGS);
+        System.out.print("Dropping table");
         onCreate(db);
     }
 
@@ -48,9 +49,8 @@ public class TagDatabase extends SQLiteOpenHelper {
                 int idFromDb = Integer.parseInt(cursor.getString(0));
                 String tagId = cursor.getString(1);
                 String dateInfo = cursor.getString(2);
-                String timeInfo = cursor.getString(3);
-                int inUseFlag = cursor.getInt(4);
-                EntranceTag oneTag = new EntranceTag(tagId, dateInfo, timeInfo, inUseFlag);
+                int inUseFlag = cursor.getInt(3);
+                EntranceTag oneTag = new EntranceTag(tagId, dateInfo, inUseFlag);
                 oneTag.SetIdFromDb(idFromDb);
                 bunchOfTags.add(oneTag);
             }while (cursor.moveToNext());
@@ -63,8 +63,7 @@ public class TagDatabase extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
 
         values.put(COLUMN_TAGID, newtag.GetTagId());
-        values.put(COLUMN_DATE, newtag.GetTagDate());
-        values.put(COLUMN_TIME, newtag.GetTagTime());
+        values.put(COLUMN_DATE_TIME, newtag.GetTagDateTime());
         values.put(COLUMN_USED, newtag.GetTagUsedFlag());
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -74,15 +73,14 @@ public class TagDatabase extends SQLiteOpenHelper {
     public void updateTag(EntranceTag newtag){
         ContentValues values = new ContentValues();
         values.put(COLUMN_TAGID, newtag.GetTagId());
-        values.put(COLUMN_DATE, newtag.GetTagDate());
-        values.put(COLUMN_TIME, newtag.GetTagTime());
+        values.put(COLUMN_DATE_TIME, newtag.GetTagDateTime());
         values.put(COLUMN_USED, newtag.GetTagUsedFlag());
         SQLiteDatabase db = this.getWritableDatabase();
         db.update(TABLE_TAGS, values, COLUMN_ID    + "    = ?", new String[] { String.valueOf(newtag.GetTagIdFromDb())});
     }
 
     public EntranceTag findTag(String name){
-        String query = "Select * FROM "    + TABLE_TAGS + " WHERE " + COLUMN_TAGID + " = " + "tagId";
+        String query = "Select * FROM "    + TABLE_TAGS + " WHERE " + COLUMN_TAGID + " = '" + name +"'";
         SQLiteDatabase db = this.getWritableDatabase();
         EntranceTag mTag = null;
         Cursor cursor = db.rawQuery(query, null);
@@ -90,10 +88,11 @@ public class TagDatabase extends SQLiteOpenHelper {
             int idFromDb = Integer.parseInt(cursor.getString(0));
             String tagId = cursor.getString(1);
             String dateInfo = cursor.getString(2);
-            String timeInfo = cursor.getString(3);
-            int inUseFlag = cursor.getInt(4);
-            mTag = new EntranceTag(tagId, dateInfo, timeInfo, inUseFlag);
+            int inUseFlag = cursor.getInt(3);
+
+            mTag = new EntranceTag(tagId, dateInfo, inUseFlag);
             mTag.SetIdFromDb(idFromDb);
+
         }
         cursor.close();
         return mTag;
@@ -104,4 +103,9 @@ public class TagDatabase extends SQLiteOpenHelper {
         db.delete(TABLE_TAGS, COLUMN_ID    + "    = ?", new String[] { String.valueOf(idInDb)});
     }
 
+    public void clearDatabase() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.delete(TABLE_TAGS,null,null); //erases everything in the table.
+        db.close();
+    }
 }

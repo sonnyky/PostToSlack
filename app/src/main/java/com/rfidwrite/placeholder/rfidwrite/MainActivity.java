@@ -23,7 +23,7 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -43,7 +43,7 @@ public class MainActivity extends Activity {
 
     TextView tvNFCContent;
     TextView message;
-    Button btnWrite;
+    Button btnWrite, btnDropDb;
 
     ImageView tagDetectionCheckMark;
     TextView detectionStatus;
@@ -60,6 +60,7 @@ public class MainActivity extends Activity {
         tvNFCContent = (TextView) findViewById(R.id.title);
         message = (TextView) findViewById(R.id.dataInput);
         btnWrite = (Button) findViewById(R.id.writeDataBtn);
+        btnDropDb = (Button) findViewById(R.id.dropDbBtn);
 
         detectionStatus = (TextView) findViewById(R.id.processStatus);
         tagDetectionCheckMark = (ImageView) findViewById(R.id.tagReadCompleteMark);
@@ -85,6 +86,14 @@ public class MainActivity extends Activity {
                     Toast.makeText(context, WRITE_ERROR, Toast.LENGTH_LONG ).show();
                     e.printStackTrace();
                 }
+            }
+        });
+
+        btnDropDb.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v) {
+               tagDatabase.clearDatabase();
             }
         });
 
@@ -132,8 +141,24 @@ public class MainActivity extends Activity {
 
             // Check if the tag name is already in the database.
             EntranceTag detectedTag = tagDatabase.findTag(text);
+
             if(detectedTag != null){
-                String detectionResult = "タグ id : " + detectedTag.GetTagIdFromDb() + "、" + detectedTag.GetTagDate() + "、 " + detectedTag.GetTagTime() + " に入場しました";
+                Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+9:00"));
+                Date currentLocalTime = cal.getTime();
+
+                Date initialDetectionDate = currentLocalTime; // just to initialize initialDetectionDate.
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy-HH:mm:ss");
+                try {
+                    initialDetectionDate = dateFormat.parse(detectedTag.GetTagDateTime());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                String readableElapsedTime = ConvertMilliSecToReadableTime(GetElapsedTime(initialDetectionDate, currentLocalTime));
+
+                int additionalCharge = CalculateAdditionalCharge(initialDetectionDate,currentLocalTime);
+
+                String detectionResult = readableElapsedTime   + " 超過しました。" + "追加料金：" + additionalCharge + "円 です。";
                 String tagDetectionStatus = "タグ認識しました";
                 detectionStatus.setText(tagDetectionStatus);
                 detectedTagDetails.setText(detectionResult);
@@ -151,21 +176,14 @@ public class MainActivity extends Activity {
             }else{
                 // If tag is not in the database, add it
                 Toast.makeText(this, "タグを記憶します... " , Toast.LENGTH_LONG).show();
-
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy-HH:mm:ss");
                 // Get current date
-                Date todayDate = Calendar.getInstance().getTime();
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                String todayString = formatter.format(todayDate);
-
-                // Get current time
                 Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+9:00"));
                 Date currentLocalTime = cal.getTime();
-                DateFormat date = new SimpleDateFormat("HH:mm:ss a");
-                date.setTimeZone(TimeZone.getTimeZone("GMT+9:00"));
-                String localTime = date.format(currentLocalTime);
+                String detectedDateTime = dateFormat.format(currentLocalTime);
 
                 // Finally add the new tag to database
-                EntranceTag newDetectedTag = new EntranceTag(text, todayString, localTime, 1);
+                EntranceTag newDetectedTag = new EntranceTag(text, detectedDateTime, 1);
                 tagDatabase.addTag(newDetectedTag);
             }
 
@@ -255,6 +273,15 @@ public class MainActivity extends Activity {
         return elapsedTimeInMilliSec;
     }
 
+    private String ConvertMilliSecToReadableTime(long millisec){
+        int hour, minute, sec;
+        sec = (int) millisec/1000;
+        hour = sec/3600;
+        minute = (sec%3600) / 60;
+        sec = (sec%3600) % 60;
+        return (Integer.toString(hour)+":"+Integer.toString(minute)+":"+Integer.toString(sec));
+    }
+
     private int CalculateAdditionalCharge(Date entry, Date exit){
         int multiplier = 0;
         long elapsedTime = GetElapsedTime(entry, exit) - 1800000; // Substract 30 mins from elapsed time.
@@ -268,6 +295,14 @@ public class MainActivity extends Activity {
             multiplier++;
         }
         return multiplier * 500; // 500 is the additional charge per 30 mins
+    }
+
+    private String DateToString(Date inputDate){
+        String output = "";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy-HH:mm:ss");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+9:00"));
+        output = dateFormat.format(inputDate);
+        return output;
     }
 
 }

@@ -35,6 +35,15 @@
         android:text="Write Data"
         app:layout_constraintTop_toBottomOf="@+id/dataInput"
         app:layout_constraintLeft_toLeftOf="@+id/dataInput" />
+    <Button
+        android:id="@+id/dropDbBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Drop DB"
+        app:layout_constraintTop_toBottomOf="@+id/writeDataBtn"
+        app:layout_constraintLeft_toLeftOf="@+id/writeDataBtn"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="134dp" />
 
     <TextView
         android:id="@+id/processStatus"
@@ -70,5 +79,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tagReadCompleteMark" />
+
+
 
 </android.support.constraint.ConstraintLayout>
