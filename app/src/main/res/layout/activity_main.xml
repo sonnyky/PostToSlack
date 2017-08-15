@@ -5,46 +5,46 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.rfidwrite.placeholder.rfidwrite.MainActivity">
+    <!--
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.051"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.032" />
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.051"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.032" />
+        <EditText
+            android:id="@+id/dataInput"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="Input Data"
+            app:layout_constraintTop_toBottomOf="@+id/title"
+            app:layout_constraintLeft_toLeftOf="@+id/title" />
 
-    <EditText
-        android:id="@+id/dataInput"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Input Data"
-        app:layout_constraintTop_toBottomOf="@+id/title"
-        app:layout_constraintLeft_toLeftOf="@+id/title" />
-
-    <Button
-        android:id="@+id/writeDataBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Write Data"
-        app:layout_constraintTop_toBottomOf="@+id/dataInput"
-        app:layout_constraintLeft_toLeftOf="@+id/dataInput" />
-    <Button
-        android:id="@+id/dropDbBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Drop DB"
-        app:layout_constraintTop_toBottomOf="@+id/writeDataBtn"
-        app:layout_constraintLeft_toLeftOf="@+id/writeDataBtn"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="134dp" />
-
+        <Button
+            android:id="@+id/writeDataBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Write Data"
+            app:layout_constraintTop_toBottomOf="@+id/dataInput"
+            app:layout_constraintLeft_toLeftOf="@+id/dataInput" />
+        <Button
+            android:id="@+id/dropDbBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Drop DB"
+            app:layout_constraintTop_toBottomOf="@+id/writeDataBtn"
+            app:layout_constraintLeft_toLeftOf="@+id/writeDataBtn"
+            tools:layout_editor_absoluteX="16dp"
+            tools:layout_editor_absoluteY="134dp" />
+    -->
     <TextView
         android:id="@+id/processStatus"
         android:layout_width="300dp"

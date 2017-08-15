@@ -57,17 +57,17 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         context = this;
 
-        tvNFCContent = (TextView) findViewById(R.id.title);
-        message = (TextView) findViewById(R.id.dataInput);
-        btnWrite = (Button) findViewById(R.id.writeDataBtn);
-        btnDropDb = (Button) findViewById(R.id.dropDbBtn);
+        //tvNFCContent = (TextView) findViewById(R.id.title);
+       // message = (TextView) findViewById(R.id.dataInput);
+       // btnWrite = (Button) findViewById(R.id.writeDataBtn);
+       // btnDropDb = (Button) findViewById(R.id.dropDbBtn);
 
         detectionStatus = (TextView) findViewById(R.id.processStatus);
         tagDetectionCheckMark = (ImageView) findViewById(R.id.tagReadCompleteMark);
         detectedTagDetails = (TextView) findViewById(R.id.tagDetails);
 
         tagDatabase = new TagDatabase(this.context);
-
+/*
         btnWrite.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -96,7 +96,7 @@ public class MainActivity extends Activity {
                tagDatabase.clearDatabase();
             }
         });
-
+*/
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         if (nfcAdapter == null) {
             // Stop here, we definitely need NFC
@@ -142,29 +142,43 @@ public class MainActivity extends Activity {
             // Check if the tag name is already in the database.
             EntranceTag detectedTag = tagDatabase.findTag(text);
 
+            // If tag has been detected before
             if(detectedTag != null){
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy-HH:mm:ss");
                 Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+9:00"));
                 Date currentLocalTime = cal.getTime();
 
-                Date initialDetectionDate = currentLocalTime; // just to initialize initialDetectionDate.
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy-HH:mm:ss");
-                try {
-                    initialDetectionDate = dateFormat.parse(detectedTag.GetTagDateTime());
-                } catch (ParseException e) {
-                    e.printStackTrace();
+                // Check if it is in use
+                if(detectedTag.GetTagUsedFlag() == 0) {
+                    // not in use, so update database
+                    String detectedDateTime = dateFormat.format(currentLocalTime);
+                    detectedTag.SetUsedFlag(1);
+                    detectedTag.SetDateTimeDetected(detectedDateTime);
+                    tagDatabase.updateTag(detectedTag);
+                }else{ // in use, so we need to calculate elapsed time and additional charge
+                    Date initialDetectionDate = currentLocalTime; // just to initialize initialDetectionDate.
+
+                    try {
+                        initialDetectionDate = dateFormat.parse(detectedTag.GetTagDateTime());
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    String readableElapsedTime = ConvertMilliSecToReadableTime(GetElapsedTime(initialDetectionDate, currentLocalTime));
+                    int additionalCharge = CalculateAdditionalCharge(initialDetectionDate,currentLocalTime);
+
+                    String detectionResult = readableElapsedTime   + " 超過しました。" + "追加料金：" + additionalCharge + "円 です。";
+
+                    detectedTagDetails.setText(detectionResult);
+                    detectedTagDetails.setVisibility(View.VISIBLE);
+
+                    detectedTag.SetUsedFlag(0);
+                    tagDatabase.updateTag(detectedTag);
                 }
-
-                String readableElapsedTime = ConvertMilliSecToReadableTime(GetElapsedTime(initialDetectionDate, currentLocalTime));
-
-                int additionalCharge = CalculateAdditionalCharge(initialDetectionDate,currentLocalTime);
-
-                String detectionResult = readableElapsedTime   + " 超過しました。" + "追加料金：" + additionalCharge + "円 です。";
                 String tagDetectionStatus = "タグ認識しました";
                 detectionStatus.setText(tagDetectionStatus);
-                detectedTagDetails.setText(detectionResult);
                 tagDetectionCheckMark.setVisibility(View.VISIBLE);
-                detectedTagDetails.setVisibility(View.VISIBLE);
-
 
                 new Handler().postDelayed(new Runnable() {
                     @Override
@@ -191,7 +205,7 @@ public class MainActivity extends Activity {
             Log.e("UnsupportedEncoding", e.toString());
         }
 
-        tvNFCContent.setText("NFC Content: " + text);
+        //tvNFCContent.setText("NFC Content: " + text);
 
     }
 

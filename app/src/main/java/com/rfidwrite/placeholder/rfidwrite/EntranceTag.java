@@ -8,7 +8,7 @@ public class EntranceTag {
     private int dbId;
     private String tagId;
     private String dateTimeDetected;
-    private int inUse;
+    private int inUse; // 0 : not used, 1 : in use
 
     public EntranceTag( String tagId, String dateTime, int inUseFlag){
         this.tagId = tagId;
