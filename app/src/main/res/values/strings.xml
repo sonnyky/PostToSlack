@@ -1,4 +1,5 @@
 <resources>
-    <string name="app_name">RfidWrite</string>
-    <string name="waiting_for_tag">リストバンドを近づけてください</string>
+    <string name="app_name">PostToSlack</string>
+    <string name="waiting_for_tag">タグに近づけてください</string>
+    <string name="name_input_title">ユーザー名入力</string>
 </resources>
