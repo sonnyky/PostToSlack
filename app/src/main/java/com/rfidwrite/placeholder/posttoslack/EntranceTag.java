@@ -1,4 +1,4 @@
-package com.rfidwrite.placeholder.rfidwrite;
+package com.rfidwrite.placeholder.posttoslack;
 
 /**
  * Created by sonny on 2017/08/04.

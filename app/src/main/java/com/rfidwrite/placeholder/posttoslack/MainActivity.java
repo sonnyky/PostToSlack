@@ -1,4 +1,4 @@
-package com.rfidwrite.placeholder.rfidwrite;
+package com.rfidwrite.placeholder.posttoslack;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -16,7 +16,6 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +27,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
+
+import allbegray.slack.SlackClientFactory;
+import allbegray.slack.webapi.SlackWebApiClient;
 
 public class MainActivity extends Activity {
 
@@ -51,6 +53,12 @@ public class MainActivity extends Activity {
 
     private TagDatabase tagDatabase;
 
+    /* variables to authenticate users */
+    private String slackToken = "";
+
+    /* Async class to perform the network calls */
+    private PostToSlack clocker;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +75,7 @@ public class MainActivity extends Activity {
         detectedTagDetails = (TextView) findViewById(R.id.tagDetails);
 
         tagDatabase = new TagDatabase(this.context);
+        clocker = new PostToSlack();
 /*
         btnWrite.setOnClickListener(new View.OnClickListener()
         {
@@ -139,8 +148,12 @@ public class MainActivity extends Activity {
             // Get the Text
             text = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1, textEncoding);
 
+            // According to the format of the text in the nfc chip, parse the text and extract the token
+            String[] separatedText = text.split("_");
+            String tagName = separatedText[0]; slackToken = separatedText[1];
+
             // Check if the tag name is already in the database.
-            EntranceTag detectedTag = tagDatabase.findTag(text);
+            EntranceTag detectedTag = tagDatabase.findTag(tagName);
 
             // If tag has been detected before
             if(detectedTag != null){
@@ -156,7 +169,8 @@ public class MainActivity extends Activity {
                     detectedTag.SetUsedFlag(1);
                     detectedTag.SetDateTimeDetected(detectedDateTime);
                     tagDatabase.updateTag(detectedTag);
-                }else{ // in use, so we need to calculate elapsed time and additional charge
+                }else{
+                    // in use, so we need to calculate elapsed time
                     Date initialDetectionDate = currentLocalTime; // just to initialize initialDetectionDate.
 
                     try {
@@ -197,9 +211,11 @@ public class MainActivity extends Activity {
                 String detectedDateTime = dateFormat.format(currentLocalTime);
 
                 // Finally add the new tag to database
-                EntranceTag newDetectedTag = new EntranceTag(text, detectedDateTime, 1);
+                EntranceTag newDetectedTag = new EntranceTag(tagName, detectedDateTime, 1);
                 tagDatabase.addTag(newDetectedTag);
             }
+
+            ClockInToSlack();
 
         } catch (UnsupportedEncodingException e) {
             Log.e("UnsupportedEncoding", e.toString());
@@ -318,5 +334,22 @@ public class MainActivity extends Activity {
         output = dateFormat.format(inputDate);
         return output;
     }
+
+    private String GetUserName(){
+        String userName = "error";
+        TextView inputField = (TextView) findViewById(R.id.userNameInputForm);
+        userName = inputField.getText().toString();
+        return userName;
+    }
+
+    private void ClockInToSlack(){
+
+        String user = GetUserName();
+        clocker.SetToken(slackToken);
+        clocker.SetUserName(user);
+        clocker.execute();
+    }
+
+
 
 }

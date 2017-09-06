@@ -1,4 +1,4 @@
-package com.rfidwrite.placeholder.rfidwrite;
+package com.rfidwrite.placeholder.posttoslack;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
