@@ -10,6 +10,7 @@ import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.Ndef;
+import android.os.AsyncTask;
 import android.os.Parcelable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -56,9 +57,6 @@ public class MainActivity extends Activity {
     /* variables to authenticate users */
     private String slackToken = "";
 
-    /* Async class to perform the network calls */
-    private PostToSlack clocker;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,7 +73,6 @@ public class MainActivity extends Activity {
         detectedTagDetails = (TextView) findViewById(R.id.tagDetails);
 
         tagDatabase = new TagDatabase(this.context);
-        clocker = new PostToSlack();
 /*
         btnWrite.setOnClickListener(new View.OnClickListener()
         {
@@ -169,6 +166,7 @@ public class MainActivity extends Activity {
                     detectedTag.SetUsedFlag(1);
                     detectedTag.SetDateTimeDetected(detectedDateTime);
                     tagDatabase.updateTag(detectedTag);
+                    ClockInToSlack(getString(R.string.clock_in));
                 }else{
                     // in use, so we need to calculate elapsed time
                     Date initialDetectionDate = currentLocalTime; // just to initialize initialDetectionDate.
@@ -189,6 +187,8 @@ public class MainActivity extends Activity {
 
                     detectedTag.SetUsedFlag(0);
                     tagDatabase.updateTag(detectedTag);
+
+                    ClockInToSlack(getString(R.string.clock_out));
                 }
                 String tagDetectionStatus = "タグ認識しました";
                 detectionStatus.setText(tagDetectionStatus);
@@ -214,8 +214,6 @@ public class MainActivity extends Activity {
                 EntranceTag newDetectedTag = new EntranceTag(tagName, detectedDateTime, 1);
                 tagDatabase.addTag(newDetectedTag);
             }
-
-            ClockInToSlack();
 
         } catch (UnsupportedEncodingException e) {
             Log.e("UnsupportedEncoding", e.toString());
@@ -342,9 +340,11 @@ public class MainActivity extends Activity {
         return userName;
     }
 
-    private void ClockInToSlack(){
+    private void ClockInToSlack(String inputString){
+        PostToSlack clocker = new PostToSlack();
 
         String user = GetUserName();
+        clocker.SetMessage(inputString);
         clocker.SetToken(slackToken);
         clocker.SetUserName(user);
         clocker.execute();

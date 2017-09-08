@@ -15,6 +15,7 @@ public class PostToSlack extends AsyncTask<Void, Void, Void> {
 
     private String userName = "";
     private String token = "";
+    private String value = "";
     SlackWebApiClient mWebApiClient;
 
     public void SetUserName(String inputName){
@@ -26,13 +27,17 @@ public class PostToSlack extends AsyncTask<Void, Void, Void> {
         mWebApiClient = SlackClientFactory.createWebApiClient(token);
     }
 
+    public void SetMessage(String inVal){
+        value = inVal;
+    }
+
     protected void onPreExecute(){
 
     }
 
     @Override
     protected  Void doInBackground(Void...params){
-        mWebApiClient.postMessage("kintai", "ハローモグ", "yayoi_nagano", false);
+        mWebApiClient.postMessage("kintai", value, "spasuzuking", true);
         return null;
     }
 }
